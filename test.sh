@@ -17,6 +17,6 @@ else
 fi
 
 export PS4='$ '
-
+echo # blank line
 set -x
 python3 test.py
