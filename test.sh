@@ -16,5 +16,6 @@ else
     exit 1
 fi
 
+export PS$='$ '
 set -x
 python3 test.py
