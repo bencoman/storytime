@@ -16,4 +16,5 @@ else
     exit 1
 fi
 
+set -x
 python3 test.py
