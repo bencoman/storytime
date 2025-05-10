@@ -5,9 +5,13 @@ git checkout scratchpad
 git add .
 git status
 
-read -p "What changed? " commit_msg
-
-git commit -m "$commit_msg" && git push origin HEAD:refs/heads/scratchpad
+# Check for staged changes
+if git diff --cached --quiet; then
+  echo "No changes staged for commit."
+else
+  read -p "What changed? " commit_msg
+  git commit -m "$commit_msg" && git push origin HEAD:refs/heads/scratchpad
+fi
 
 if [ -f venv/bin/activate ]; then
     source venv/bin/activate
