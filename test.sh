@@ -16,6 +16,6 @@ else
     exit 1
 fi
 
-export PS$='$ '
+export PS4='$ '
 set -x
 python3 test.py
