@@ -1,8 +1,11 @@
 import json
+import os
 from openai import OpenAI
 from logutil import Log
+from datetime import datetime
 
 APIKEYFILE="secure/api.key"
+THREADS_FILE = "data/threads.json"
 
 class StoryTimeClient:
     def __init__(self, log, app):
@@ -43,9 +46,45 @@ class StoryTimeClient:
             self.log.write("Fetch Assistants Error", {"error": str(e)})
             raise
 
-    def create_thread(self):
+    def list_threads(self):
+        try:
+            with open(THREADS_FILE, "r") as f:
+                threads = json.load(f)
+            self.log.write("List Threads", {"thread_ids": [t["thread_id"] for t in threads]})
+            return threads
+        except FileNotFoundError:
+            self.log.write("List Threads Error", {"error": "Threads file not found"})
+            return []
+        except Exception as e:
+            msg = f"Failed to fetch threads: {e}"
+            self._update_status(msg)
+            self.log.write("Fetch Threads Error", {"error": str(e)})
+            raise
+
+    def _save_thread(self, thread_id, assistant, thread_name="Unnamed Thread"):
+        if not os.path.exists(THREADS_FILE):
+            with open(THREADS_FILE, "w") as f:
+                json.dump([], f)
+
+        with open(THREADS_FILE, "r") as f:
+            threads = json.load(f)
+
+        thread_data = {
+            "thread_id": thread_id,
+            "thread_name": thread_name,
+            "assistant": assistant,
+            "created_at": str(datetime.now()),
+            "last_used_at": str(datetime.now())
+        }
+        threads.append(thread_data)
+
+        with open(THREADS_FILE, "w") as f:
+            json.dump(threads, f, indent=4)
+
+    def create_thread(self, assistant_id, thread_name="Unnamed Thread"):
         result = self._client.beta.threads.create()
         self.log.write("Create Thread", {"thread_id": result.id})
+        self._save_thread(result.id, assistant_id, thread_name)
         return result
 
     def create_message(self, thread_id, role, content):
