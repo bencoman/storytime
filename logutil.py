@@ -1,13 +1,23 @@
 import json
+import os
 
-ONECYCLELOG="one_cycle.log"
-RUNNINGLOG="running.log"
+LOG_DIR = "log"
+ONECYCLELOG = os.path.join(LOG_DIR, "one_cycle.log")
+RUNNINGLOG = os.path.join(LOG_DIR, "running.log")
 
 class Log:
-    def __init__(self, path="etc/one_cycle.log", echo=False):
+    def __init__(self, path=ONECYCLELOG, echo=False, pytest_run=False):
         self.path = path
         self.echo = echo
         self._end_cycle = True
+
+        # Ensure the log directory exists
+        os.makedirs(LOG_DIR, exist_ok=True)
+
+        # Initialize running log with 'PYTEST RUN' if pytest_run is True
+        if pytest_run:
+            with open(RUNNINGLOG, "w") as f:
+                f.write("PYTEST RUN\n")
 
     def end_cycle(self):
         self._end_cycle = True
@@ -31,7 +41,6 @@ class Log:
             if self.echo:
                 print(f"--- {label} ---")
                 print(json.dumps(payload, indent=2))
-
 
         except Exception as e:
             print(f"Failed to write to log file: {e}")

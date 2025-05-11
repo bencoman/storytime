@@ -5,8 +5,8 @@ from datetime import datetime
 
 @pytest.fixture(scope="session", autouse=True)
 def clear_running_log():
-    with open("log/running.log", "w") as f:
-        f.write("PYTEST RUN\n")
+    # Use the Log class to initialize the running log with 'PYTEST RUN'
+    Log(pytest_run=True)
 
 @pytest.fixture
 def dummy_app():
