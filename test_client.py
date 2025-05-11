@@ -4,14 +4,9 @@ from client import StoryTimeClient
 from datetime import datetime
 
 @pytest.fixture(scope="session", autouse=True)
-def clear_running_log():
-    # Use the Log class to initialize the running log with 'PYTEST RUN'
-    Log(pytest_run=True)
-
-@pytest.fixture(scope="session")
 def log_instance():
     # Create a single Log instance for the entire test session
-    return Log(pytest_run=True)
+    return Log(echo=True, clearLog=True)
 
 @pytest.fixture
 def dummy_app():

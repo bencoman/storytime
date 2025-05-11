@@ -6,7 +6,7 @@ ONECYCLELOG = os.path.join(LOG_DIR, "one_cycle.log")
 RUNNINGLOG = os.path.join(LOG_DIR, "running.log")
 
 class Log:
-    def __init__(self, path=ONECYCLELOG, echo=False, pytest_run=False):
+    def __init__(self, path=ONECYCLELOG, echo=False, clearLog=False):
         self.path = path
         self.echo = echo
         self._end_cycle = True
@@ -14,10 +14,12 @@ class Log:
         # Ensure the log directory exists
         os.makedirs(LOG_DIR, exist_ok=True)
 
-        # Initialize running log with 'PYTEST RUN' if pytest_run is True
-        if pytest_run:
-            with open(RUNNINGLOG, "w") as f:
-                f.write("PYTEST RUN\n")
+        # Delete running log if needed to clear it at the start 
+        if clearLog:
+            try:
+                os.remove(RUNNINGLOG)
+            except FileNotFoundError:
+                pass
 
     def end_cycle(self):
         self._end_cycle = True
