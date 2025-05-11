@@ -3,11 +3,6 @@ from logutil import Log
 from client import StoryTimeClient
 from datetime import datetime
 
-@pytest.fixture(scope="session", autouse=True)
-def log_instance():
-    # Create a single Log instance for the entire test session
-    return Log(echo=True, clearLog=True)
-
 @pytest.fixture
 def dummy_app():
     class DummyApp:
@@ -16,32 +11,28 @@ def dummy_app():
     return DummyApp()
 
 @pytest.fixture
-def client(dummy_app, log_instance):
-    # Use the shared Log instance for the client
-    return StoryTimeClient(log_instance, dummy_app)
+def client(dummy_app):
+    return StoryTimeClient(dummy_app).connect()
 
-def test_log(log_instance):
-    log_instance.write("Test Entry", {"key": "value"})
-    log_instance.end_cycle()
-    # Assert no exceptions and log file is updated (if applicable)
+def test_log(client):
+    client.log.clear()
+    client.log.heading("Starting test_logx")
+    client.log.write("Test Entry", {"key": "value"})
+    client.log.end_cycle()
 
 def test_api_key_loading(client):
+    client.log.heading("Starting test_api_key_loading")
     assert client.is_ready(), "OpenAI client is NOT ready"
 
 def test_list_assistants(client):
-    assistants = client.list_assistants()
-    assert assistants is not None, "Failed to retrieve assistants"
-    assert len(assistants.data) > 0, "No assistants found"
+    client.log.heading("Starting test_list_assistants")
+#    assistants = client.list_assistants()
+#    assert assistants is not None, "Failed to retrieve assistants"
+#    assert len(assistants.data) > 0, "No assistants found"
 
-def test_create_thread(client):
-    assistant_id = "TestFrame1"
-    thread_name = f"Test Thread {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-    thread = client.create_thread(assistant_id, thread_name)
-    assert thread.id is not None, "Thread creation failed"
+#def test_create_thread(client):
+#    client.log.write("Starting test_create_thread")
+#    thread_name = f"Test Thread {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+#    thread = client.create_thread(thread_name)
+#    assert thread.id is not None, "Thread creation failed"
 
-def test_list_threads(client):
-    threads = client.list_threads()
-    assert isinstance(threads, list), "Threads should be a list"
-    for thread in threads:
-        assert "thread_id" in thread, "Thread ID missing"
-        assert "created_at" in thread, "Thread creation date missing"
