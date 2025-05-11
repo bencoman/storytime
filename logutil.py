@@ -37,17 +37,17 @@ class Log:
                 open(ONECYCLELOG, "w").close()
 
             with open(ONECYCLELOG, "a") as f:
-                f.write(f"--- {label} ---\n")
+                f.write(label)
                 json.dump(payload, f, indent=2)
                 f.write("\n")
 
             with open(RUNNINGLOG, "a") as f:
-                f.write(f"--- {label} ---\n")
+                f.write(label)
                 json.dump(payload, f, indent=2)
                 f.write("\n")
 
             if self.echo:
-                print(f"--- {label} ---")
+                print(label)
                 print(json.dumps(payload, indent=2))
 
         except Exception as e:

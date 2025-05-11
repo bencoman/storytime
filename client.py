@@ -47,7 +47,7 @@ class StoryTimeClient:
             raise
 
     def create_thread(self, thread_name):
-        result = self._client.beta.threads.create(name=thread_name)
+        result = self._client.beta.threads.create()
         self.log.write("Create Thread", {"thread_id": result.id, "name": thread_name})
         return result
 

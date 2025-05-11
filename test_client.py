@@ -26,13 +26,13 @@ def test_api_key_loading(client):
 
 def test_list_assistants(client):
     client.log.heading("Starting test_list_assistants")
-#    assistants = client.list_assistants()
-#    assert assistants is not None, "Failed to retrieve assistants"
-#    assert len(assistants.data) > 0, "No assistants found"
+    assistants = client.list_assistants()
+    assert assistants is not None, "Failed to retrieve assistants"
+    assert len(assistants.data) > 0, "No assistants found"
 
-#def test_create_thread(client):
-#    client.log.write("Starting test_create_thread")
-#    thread_name = f"Test Thread {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-#    thread = client.create_thread(thread_name)
-#    assert thread.id is not None, "Thread creation failed"
+def test_create_thread(client):
+    client.log.heading("Starting test_create_thread")
+    thread_name = f"Test Thread {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+    thread = client.create_thread(thread_name)
+    assert thread.id is not None, "Thread creation failed"
 
