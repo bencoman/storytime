@@ -1,8 +1,12 @@
 import json
 from openai import OpenAI
 from logutil import Log
+from datetime import datetime
+
 
 APIKEYFILE="secure/api.key"
+THREADSFILE="data/threads.json"
+TESTASSISTANT="Test Frame 1"
 
 class StoryTimeClient:
     def __init__(self, app):
@@ -48,7 +52,32 @@ class StoryTimeClient:
 
     def create_thread(self, thread_name):
         result = self._client.beta.threads.create()
-        self.log.write("Create Thread", {"thread_id": result.id, "name": thread_name})
+
+        # Prepare thread data
+        thread_data = {
+            "thread_id": result.id,
+            "name": thread_name,
+            "assistant_id": TESTASSISTANT,
+            "created_at": datetime.fromtimestamp(result.created_at).isoformat(sep=' ', timespec='microseconds'),
+            "last_used_at": datetime.fromtimestamp(result.created_at).isoformat(sep=' ', timespec='microseconds')
+        }
+        self.log.write("Response", result.to_dict())
+        self.log.write("Store Thread", thread_data)
+
+        # Read existing threads from the file
+        try:
+            with open(THREADSFILE, "r") as f:
+                threads = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            threads = []
+
+        # Insert the new thread data into the array
+        threads.append(thread_data)
+
+        # Write the updated array back to the file
+        with open(THREADSFILE, "w") as f:
+            json.dump(threads, f, indent=2)
+
         return result
 
     def create_message(self, thread_id, role, content):
