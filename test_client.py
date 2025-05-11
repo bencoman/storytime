@@ -16,7 +16,7 @@ def client(dummy_app):
 
 def test_log(client):
     client.log.clear()
-    client.log.heading("Starting test_logx")
+    client.log.heading("Starting test_log")
     client.log.write("Test Entry", {"key": "value"})
     client.log.end_cycle()
 
