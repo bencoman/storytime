@@ -8,6 +8,11 @@ def clear_running_log():
     # Use the Log class to initialize the running log with 'PYTEST RUN'
     Log(pytest_run=True)
 
+@pytest.fixture(scope="session")
+def log_instance():
+    # Create a single Log instance for the entire test session
+    return Log(pytest_run=True)
+
 @pytest.fixture
 def dummy_app():
     class DummyApp:
@@ -16,14 +21,13 @@ def dummy_app():
     return DummyApp()
 
 @pytest.fixture
-def client(dummy_app):
-    log = Log(echo=True)
-    return StoryTimeClient(log, dummy_app)
+def client(dummy_app, log_instance):
+    # Use the shared Log instance for the client
+    return StoryTimeClient(log_instance, dummy_app)
 
-def test_log():
-    log = Log(echo=True)
-    log.write("Test Entry", {"key": "value"})
-    log.end_cycle()
+def test_log(log_instance):
+    log_instance.write("Test Entry", {"key": "value"})
+    log_instance.end_cycle()
     # Assert no exceptions and log file is updated (if applicable)
 
 def test_api_key_loading(client):
