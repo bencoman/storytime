@@ -11,5 +11,5 @@ def test_make_test_request():
         ]
     )
     assert response is not None, "Response should not be None"
-    assert "choices" in response, "Response should contain 'choices'"
-    assert len(response["choices"]) > 0, "Response should have at least one choice"
+    assert hasattr(response, "choices"), "Response should have 'choices' attribute"
+    assert len(response.choices) > 0, "Response should have at least one choice"
