@@ -29,10 +29,10 @@ class StoryTimeClient:
                     api_key=key,
                     default_headers={"OpenAI-Beta": "assistants=v2"}
                 )
-                self.log.write("API Key Loaded", {"status": "success"})
+                self.log.log_local("API Key Loaded", {"status": "success"})
         except FileNotFoundError:
             self._update_status("API key file not found")
-            self.log.write("API Key Load Error", {"error": "api.key not found"})
+            self.log.log_local("API Key Load Error", {"error": "api.key not found"})
             self._client = None
         return self
 
@@ -42,12 +42,12 @@ class StoryTimeClient:
     def list_assistants(self):
         try:
             result = self._client.beta.assistants.list()
-            self.log.write("List Assistants", result.to_dict())
+            self.log.log_local("List Assistants", {"assistants": result.to_dict()})
             return result
         except Exception as e:
             msg = f"Failed to fetch assistants: {e}"
             self._update_status(msg)
-            self.log.write("Fetch Assistants Error", {"error": str(e)})
+            self.log.log_local("Fetch Assistants Error", {"error": str(e)})
             raise
 
     def create_thread(self, thread_name):
@@ -61,8 +61,7 @@ class StoryTimeClient:
             "created_at": datetime.fromtimestamp(result.created_at).isoformat(sep=' ', timespec='microseconds'),
             "last_used_at": datetime.fromtimestamp(result.created_at).isoformat(sep=' ', timespec='microseconds')
         }
-        self.log.write("Response", result.to_dict())
-        self.log.write("Store Thread", thread_data)
+        self.log.log_local("Store Thread", thread_data)
 
         # Read existing threads from the file
         try:
@@ -87,17 +86,32 @@ class StoryTimeClient:
 
     def run_thread(self, thread_id, assistant_id):
         result = self._client.beta.threads.runs.create(thread_id=thread_id, assistant_id=assistant_id)
-        self.log.write("Run Thread", {"thread_id": thread_id, "assistant_id": assistant_id, "run_id": result.id})
+        self.log.log_local("Run Thread", {"thread_id": thread_id, "assistant_id": assistant_id, "run_id": result.id})
         return result
 
     def get_run_status(self, thread_id, run_id):
         result = self._client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run_id)
-        self.log.write("Run Status", {"thread_id": thread_id, "run_id": run_id, "status": result.status})
+        self.log.log_local("Run Status", {"thread_id": thread_id, "run_id": run_id, "status": result.status})
         return result
 
     def get_messages(self, thread_id):
         result = self._client.beta.threads.messages.list(thread_id=thread_id)
         reply_text = result.data[0].content[0].text.value.strip() if result.data else ""
-        self.log.write("Cycle Complete", {"thread_id": thread_id, "reply": reply_text})
-        self.log.end_cycle()
+        self.log.log_local("Cycle Complete", {"thread_id": thread_id, "reply": reply_text})
         return result
+
+    def meta_add(self, assistant_id, metadata):
+        result = self._client.beta.assistants.modify(
+            assistant_id=assistant_id,
+            metadata=metadata
+        )
+        self.log.log_local("Meta Add", {"assistant_id": assistant_id, "metadata": metadata})
+        return result
+
+    def meta_get(self, assistant_id):
+        result = self._client.beta.assistants.retrieve(
+            assistant_id=assistant_id
+        )
+        metadata = result.metadata if hasattr(result, 'metadata') else {}
+        self.log.log_local("Meta Get", {"assistant_id": assistant_id, "metadata": metadata})
+        return metadata
