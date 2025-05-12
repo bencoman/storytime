@@ -26,6 +26,7 @@ class StoryTimeClient:
             with open(APIKEYFILE, "r") as f:
                 key = f.read().strip()
                 self._client = OpenAI(
+                    log="debug",
                     api_key=key,
                     default_headers={"OpenAI-Beta": "assistants=v2"}
                 )

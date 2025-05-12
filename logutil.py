@@ -18,7 +18,8 @@ class Log:
         os.makedirs(LOG_DIR, exist_ok=True)
 
         # Enable OpenAI HTTP logging
-        openai.log = "debug"
+        # TODO: The 'openai.log' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI(log="debug")'
+        # openai.log = "debug"
 
         # Initialize logger
         self.logger = logging.getLogger("Log")
