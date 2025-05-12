@@ -7,7 +7,7 @@ APIKEYFILE = "secure/api.key"
 class OpenAIClient:
 
     def __init__(self):
-        self.log = Log()
+        self.log = Log.single_instance()
 
         with open(APIKEYFILE, "r") as f:
             self.key = f.read().strip()

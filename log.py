@@ -3,16 +3,30 @@ import httpx
 from pathlib import Path
 from datetime import datetime
 
-class Log:
-    LOG_FILE = Path("log/openai_http.log")
+LOG_FILE = Path("log/openai_http.log")
+
+class SingletonMeta(type):
+    def __init__(cls, name, bases, dct):
+        cls.__instance = None
+        super().__init__(name, bases, dct)
+
+    def __call__(cls, *args, **kwargs):
+        if cls.__instance is None:
+            cls.__instance = super().__call__(*args, **kwargs)
+        return cls.__instance
+
+    def single_instance(cls):
+        return cls()
+
+class Log(metaclass=SingletonMeta):
 
     def __init__(self):
         # Clear the log file upon instantiation
-        self.LOG_FILE.write_text("")
+        LOG_FILE.write_text("LOG FILE CLEARED\n\n", encoding="utf-8")
 
     @staticmethod
     def append_log(block: str):
-        with Log.LOG_FILE.open("a", encoding="utf-8") as f:
+        with LOG_FILE.open("a", encoding="utf-8") as f:
             f.write(block + "\n\n")
 
     @staticmethod
