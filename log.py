@@ -1,9 +1,14 @@
 import json
-from pathlib import Path
 import httpx
+from pathlib import Path
+from datetime import datetime
 
 class Log:
     LOG_FILE = Path("log/openai_http.log")
+
+    def __init__(self):
+        # Clear the log file upon instantiation
+        self.LOG_FILE.write_text("")
 
     @staticmethod
     def append_log(block: str):
@@ -51,3 +56,7 @@ Body:
     @staticmethod
     def format_headers(headers):
         return "\n".join(f"{k}: {v}" for k, v in headers.items())
+
+    def lognote(self, note: str):
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+        self.append_log(f"NOTE: {note} @ {timestamp}")

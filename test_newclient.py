@@ -3,6 +3,7 @@ from newclient import OpenAIClient
 
 def test_make_test_request():
     client = OpenAIClient()
+    client.log.lognote("Starting test_make_test_request")
     response = client.completions().create(
         model="gpt-3.5-turbo",
         messages=[
