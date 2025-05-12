@@ -2,6 +2,7 @@ import json
 import os
 import openai
 import logging
+import httpx
 
 LOG_DIR = "log"
 ONECYCLELOG = os.path.join(LOG_DIR, "one_cycle.log")
@@ -73,3 +74,50 @@ class Log:
     def log_local(self, event, details=None):
         """Log local interactions, such as file operations or non-API events."""
         self._write(f"{{Local Event: {event} - Details: {details} }}")
+
+# Log the actual request body as pretty-printed JSON
+def log_request(request: httpx.Request):
+    try:
+        body_dict = json.loads(request.content.decode())
+        pretty_body = json.dumps(body_dict, indent=2)
+    except Exception:
+        pretty_body = request.content.decode(errors="replace")
+
+    log = f"""--- REQUEST ---
+{request.method} {request.url}
+
+Headers:
+{format_headers(request.headers)}
+
+Body:
+{pretty_body}
+"""
+    append_log(log)
+
+# Log the response body as pretty-printed JSON
+def log_response(response: httpx.Response):
+    try:
+        response.read()
+        pretty_body = json.dumps(response.json(), indent=2)
+    except Exception:
+        pretty_body = response.text
+
+    log = f"""--- RESPONSE ---
+Status: {response.status_code}
+
+Headers:
+{format_headers(response.headers)}
+
+Body:
+{pretty_body}
+"""
+    append_log(log)
+
+# Helper to format headers
+def format_headers(headers):
+    return "\n".join(f"{k}: {v}" for k, v in headers.items())
+
+# Append log to file
+def append_log(block: str):
+    with open(RUNNINGLOG, "a", encoding="utf-8") as f:
+        f.write(block + "\n\n")

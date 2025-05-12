@@ -1,8 +1,11 @@
+import logging
 import openai
 from openai import OpenAI
-
-client = OpenAI(api_key=api_key)
 import os
+
+#logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger("openai")
+logger.setLevel(logging.DEBUG)
 
 # Enable OpenAI HTTP logging to the console
 # TODO: The 'openai.log' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI(log="debug")'
@@ -24,6 +27,11 @@ with open(API_KEY_PATH, "r") as f:
 # Perform an API request to generate a log
 try:
     # Use the latest OpenAI API interface to create a chat completion
+#    client = OpenAI(api_key=api_key,log="debug")
+    client=OpenAI(
+                    api_key=api_key,
+                    default_headers={"OpenAI-Beta": "assistants=v2"}
+                )
     response = client.chat.completions.create(model="gpt-3.5-turbo",
     messages=[
         {"role": "system", "content": "You are a helpful assistant."},

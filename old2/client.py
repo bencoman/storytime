@@ -1,7 +1,8 @@
 import json
 from openai import OpenAI
-from logutil import Log
+from logutil import Log, log_request, log_response
 from datetime import datetime
+import httpx
 
 
 APIKEYFILE="secure/api.key"
@@ -25,12 +26,22 @@ class StoryTimeClient:
         try:
             with open(APIKEYFILE, "r") as f:
                 key = f.read().strip()
-                self._client = OpenAI(
-                    log="debug",
-                    api_key=key,
-                    default_headers={"OpenAI-Beta": "assistants=v2"}
-                )
-                self.log.log_local("API Key Loaded", {"status": "success"})
+
+            # Create custom HTTP client with logging
+            http_client = httpx.Client(
+                event_hooks={
+                    "request": [log_request],
+                    "response": [log_response],
+                },
+                timeout=30.0,
+            )
+
+            # Create OpenAI client
+            self._client = OpenAI(
+                api_key=key,
+                http_client=http_client,
+            )
+            self.log.log_local("API Key Loaded", {"status": "success"})
         except FileNotFoundError:
             self._update_status("API key file not found")
             self.log.log_local("API Key Load Error", {"error": "api.key not found"})
