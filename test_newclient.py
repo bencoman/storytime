@@ -1,5 +1,6 @@
 import pytest
 from newclient import OpenAIClient
+from datetime import datetime
 
 @pytest.fixture
 def dummy_app():
@@ -50,3 +51,24 @@ def test_list_assistants():
     assistants = client.list_assistants()
     assert assistants is not None, "Failed to retrieve assistants"
     assert len(assistants.data) > 0, "No assistants found"
+
+def test_thread_management():
+    client = OpenAIClient()
+
+    # Define a unique thread name with date-time
+    thread_name = f"Test Thread {datetime.now().isoformat(sep=' ', timespec='seconds')}"
+
+    # Get the list of threads and confirm the unqiue name doesn't exist
+    threads = client.list_threads()
+    # Ensure the thread has a 'thread_name' key before comparing
+    assert all(thread.get("thread_name") != thread_name for thread in threads), "Thread name already exists"
+
+    # Create a thread with the new name and store it in the file
+    new_thread = client.create_thread(thread_name)
+    assert new_thread["thread_name"] == thread_name, "Thread creation failed"
+
+    # Get the updated list of threads and check the name is in it
+    updated_threads = client.list_threads()
+    client.log.append_log(f"New Thread name: {thread_name}")
+    client.log.append_json(updated_threads)
+    assert any(thread["thread_name"] == thread_name for thread in updated_threads), "Thread name not found in updated list"

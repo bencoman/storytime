@@ -30,6 +30,11 @@ class Log(metaclass=SingletonMeta):
             f.write(block + "\n\n")
 
     @staticmethod
+    def append_json(jsondata: str):
+        with LOG_FILE.open("a", encoding="utf-8") as f:
+            json.dump(jsondata, f, indent=2)
+
+    @staticmethod
     def log_request(request: httpx.Request):
         try:
             body_dict = json.loads(request.content.decode())
