@@ -23,9 +23,18 @@ class OpenAIClient:
         self.client = OpenAI(
             api_key=self.key,
             http_client=self.http_client,
+            default_headers={"OpenAI-Beta": "assistants=v2"}
+
         )
         self.log.lognote("OpenAIClient initialized")
 
     def completions(self):
         return self.client.chat.completions
+
+    def listModels(self):
+        return self.client.models.list()
+
+    def list_assistants(self):
+        # Assuming this method fetches a list of assistants from the OpenAI API
+        return self.client.beta.assistants.list()
 

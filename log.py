@@ -74,3 +74,8 @@ Body:
     def lognote(self, note: str):
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
         self.append_log(f"NOTE: {note} @ {timestamp}")
+
+    def logMethodStart(self):
+        import inspect
+        caller = inspect.stack()[1]  # Get the caller's stack frame
+        self.append_log(f"METHOD START: {caller.function}")
