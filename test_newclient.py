@@ -69,6 +69,6 @@ def test_thread_management():
 
     # Get the updated list of threads and check the name is in it
     updated_threads = client.list_threads()
-    client.log.append_log(f"New Thread name: {thread_name}")
+    client.log.append_txt(f"New Thread name: {thread_name}")
     client.log.append_json(updated_threads)
     assert any(thread["thread_name"] == thread_name for thread in updated_threads), "Thread name not found in updated list"

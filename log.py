@@ -25,7 +25,7 @@ class Log(metaclass=SingletonMeta):
         LOG_FILE.write_text("LOG FILE CLEARED\n\n", encoding="utf-8")
 
     @staticmethod
-    def append_log(block: str):
+    def append_txt(block: str):
         with LOG_FILE.open("a", encoding="utf-8") as f:
             f.write(block + "\n\n")
 
@@ -51,7 +51,7 @@ Headers:
 Body:
 {pretty_body}
 """
-        Log.append_log(log)
+        Log.append_txt(log)
 
     @staticmethod
     def log_response(response: httpx.Response):
@@ -70,7 +70,7 @@ Headers:
 Body:
 {pretty_body}
 """
-        Log.append_log(log)
+        Log.append_txt(log)
 
     @staticmethod
     def format_headers(headers):
@@ -78,9 +78,9 @@ Body:
 
     def lognote(self, note: str):
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
-        self.append_log(f"NOTE: {note} @ {timestamp}")
+        self.append_txt(f"NOTE: {note} @ {timestamp}")
 
     def logMethodStart(self):
         import inspect
         caller = inspect.stack()[1]  # Get the caller's stack frame
-        self.append_log(f"METHOD START: {caller.function}")
+        self.append_txt(f"METHOD START: {caller.function}")
